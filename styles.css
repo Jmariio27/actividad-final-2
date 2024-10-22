@@ -1,0 +1,49 @@
+body {
+    background-color: darkgray;
+  }
+  
+  head {
+    background-color: aliceblue;
+  }
+  
+  main {
+    margin-top: 50px;
+  }
+  
+  .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .card-body {
+    flex-grow: 1;
+  }
+  
+  .card-text {
+    display: none;
+  }
+  
+  .card .show-description .card-text {
+    display: block;
+  }
+  
+
+  .card-price {
+    display: block;
+  }
+  
+  .btn-toggle {
+    margin-top: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .btn-toggle:hover {
+    background-color: #0056b3;
+  }
+  
