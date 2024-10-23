@@ -46,4 +46,9 @@ body {
   .btn-toggle:hover {
     background-color: #0056b3;
   }
+
+  #imagen-producto {
+    width: 400px;
+    height: 300px;
+  }
   

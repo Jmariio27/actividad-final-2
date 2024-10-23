@@ -41,13 +41,13 @@ fetch(url)
       const card = `
         <div class="col">
           <div class="card h-100">
-            <img src="${product.image}" class="card-img-top" alt="${product.title}">
+            <img src="${product.image}" class="img-thumbnail" id="imagen-producto" alt="${product.title}">
             <div class="card-body">
-              <h5 class="card-title">${product.title}</h5>
+              <h5 class="card-title">${product.title.length > 15 ? product.title.slice(0, 15).concat('...') : product.title}</h5>
               <p class="card-text">Categoría: ${product.category}</p>
               <p class="card-text short-description">${product.description.slice(0, 50)}...</p>
               <p class="card-text full-description" style="display:none;">${product.description}</p>
-              <p class="card-price"><strong>Precio: $${product.price}</strong></p>
+              <p class="card-price alert alert-success text-center"><strong>Precio: $${product.price}</strong></p>
               <button class="btn-toggle">Ver más</button>
             </div>
           </div>
