@@ -1,91 +1,124 @@
-const url = 'https://fakestoreapi.com/products';
 
-fetch(url)
-  .then(response => response.json())
-  .then(products => {
-    const container = document.querySelector('#productContainer');
-    container.innerHTML = ''; 
+async function fetchDataFromAPI(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Error en la solicitud: ${response.statusText}`);
 
-
-    const limitedProducts = products.slice(0, 16);
-
-    limitedProducts.forEach(product => createCard(product));
-
-    const select = document.querySelector('#productFilter');
-    const allOption = document.createElement('option');
-    allOption.value = 'all';
-    allOption.textContent = 'Ver todos';
-    select.appendChild(allOption);
-
-    limitedProducts.forEach(product => {
-      const option = document.createElement('option');
-      option.value = product.id;
-      option.textContent = product.title;
-      select.appendChild(option);
-    });
-
-
-    select.addEventListener('change', (e) => {
-      const selectedId = e.target.value;
-      container.innerHTML = '';
-
-      if (selectedId === 'all') {
-        limitedProducts.forEach(product => createCard(product));
-      } else {
-        const selectedProduct = limitedProducts.find(p => p.id == selectedId);
-        createCard(selectedProduct);
-      }
-    });
-
-    function createCard(product) {
-      const card = `
-        <div class="col">
-          <div class="card h-100">
-            <img src="${product.image}" class="img-thumbnail" id="imagen-producto" alt="${product.title}">
-            <div class="card-body">
-              <h5 class="card-title">${product.title.length > 15 ? product.title.slice(0, 15).concat('...') : product.title}</h5>
-              <p class="card-text">Categoría: ${product.category}</p>
-              <p class="card-text short-description">${product.description.slice(0, 50)}...</p>
-              <p class="card-text full-description" style="display:none;">${product.description}</p>
-              <p class="card-price alert alert-success text-center"><strong>Precio: $${product.price}</strong></p>
-              <button class="btn-toggle">Ver más</button>
-            </div>
-          </div>
-        </div>
-      `;
-      container.innerHTML += card;
+        const data = await response.json();
+        return data; 
+    } catch (error) {
+        console.error('Error al cargar los datos de la API:', error);
+        return null;
     }
+}
 
 
-    document.addEventListener('click', function (e) {
-      if (e.target.classList.contains('btn-toggle')) {
-        const cardBody = e.target.closest('.card-body');
-        const shortDescription = cardBody.querySelector('.short-description');
-        const fullDescription = cardBody.querySelector('.full-description');
-        
-        if (fullDescription.style.display === 'none') {
-          shortDescription.style.display = 'none';
-          fullDescription.style.display = 'block';
-          e.target.textContent = 'Ver menos';
-        } else {
-          shortDescription.style.display = 'block';
-          fullDescription.style.display = 'none';
-          e.target.textContent = 'Ver más';
-        }
-      }
+function displayProducts(products) {
+    const cardContainer = document.getElementById('cardContainer'); 
+    cardContainer.innerHTML = ''; 
+
+    // Recorrer los productos y crear tarjetas (cards) por cada uno
+    products.forEach(product => {
+        const card = document.createElement('div');
+        card.classList.add('card'); // Agregar clase CSS para dar estilo
+
+        // Información del producto desde la API
+        const productTitle = product.title || 'Producto sin título';
+        const productDescription = product.description || 'Descripción no disponible';
+        const productPrice = product.price ? `Precio: $${product.price}` : 'Precio no disponible';
+        const productImage = product.image || 'default.jpg'; // Imagen por defecto si no está disponible
+
+        // Crear el contenido HTML de la card
+        card.innerHTML = `
+            <h3>${productTitle}</h3>
+            <img src="${productImage}" alt="${productTitle}">
+            <p>${productDescription}</p>
+            <p>${productPrice}</p>
+        `;
+
+        // Agregar la card al contenedor
+        cardContainer.appendChild(card);
+    });
+}
+// Función para filtrar los productos por título
+function filterProducts(products) {
+    const productFilter = document.querySelector('#productFilter'); 
+    const optionf = document.createElement('option');
+        optionf.value = 'all';
+        optionf.textContent = 'Ver todos';
+        select.appendChild(optionf);
+    // Llenar el select con los títulos de los productos
+        products.forEach(product => {
+        const option = document.createElement('option');
+        option.value = product.title;
+        option.textContent = product.title;
+        productFilter.appendChild(option);
     });
 
-    document.getElementById('searchForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const filteredProducts = products.filter(product => 
-        product.title.toLowerCase().includes(query) || 
-        product.description.toLowerCase().includes(query)
-      );
-      container.innerHTML = '';
-      filteredProducts.forEach(product => createCard(product));
+        productFilter.addEventListener('change', () => {
+        const selectedTitle = productFilter.value;
+        const filteredProducts = products.filter(product => product.title === selectedTitle);
+        displayProducts(filteredProducts);
     });
-  })
-  
-  .catch(error => console.error('Error fetching data:', error));
 
+    
+}
+
+
+
+
+// Llamada para obtener los datos y mostrarlos al cargar la página
+document.addEventListener('DOMContentLoaded', async () => {
+    const url = 'https://fakestoreapi.com/products'; // URL de la API
+    const products = await fetchDataFromAPI(url); // Obtener los productos de la API
+
+    if (products) {
+        displayProducts(products); // Mostrar los productos en la página
+    } else {
+        console.error('No se pudieron obtener los productos.');
+    }
+});
+
+
+
+
+// Función para mostrar un solo producto seleccionado
+function displaySingleProduct(product) {
+    const cardContainer = document.getElementById('cardContainer');
+    cardContainer.innerHTML = ''; // Limpiar el contenido previo
+
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+    const productTitle = product.title || 'Producto sin título';
+    const productDescription = product.description || 'Descripción no disponible';
+    const productPrice = product.price ? `Precio: $${product.price}` : 'Precio no disponible';
+    const productImage = product.image || 'default.jpg';
+
+    card.innerHTML = `
+        <h3>${productTitle}</h3>
+        <img src="${productImage}" alt="${productTitle}">
+        <p>${productDescription}</p>
+        <p>${productPrice}</p>
+        <button id="backButton">Volver a la tienda</button>
+    `;
+
+    // Evento para volver a la lista de productos
+    card.querySelector('#backButton').addEventListener('click', async () => {
+        const products = await fetchDataFromAPI('https://fakestoreapi.com/products');
+        if (products) displayProducts(products);
+    });
+
+    cardContainer.appendChild(card);
+}
+
+const fillSelectOptions = (products) => {
+    const select = document.getElementById('#productFilter');
+    
+    products.forEach(product => {
+        const option = document.createElement('option');
+        option.value = product.id; // Usamos el ID del producto como valor
+        option.textContent = product.title; // Mostrar el título del producto en el select
+        select.appendChild(option);
+    });
+} 
